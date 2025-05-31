@@ -3,7 +3,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 //import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useSelector, useDispatch } from 'react-redux';
-import { changeOption } from '../../reducers/optionSlice';  // Ajusta esta ruta si es necesario
+import { changeOption } from '../../reducers/optionSlice'; 
 
 import "./Menu.scss";
 

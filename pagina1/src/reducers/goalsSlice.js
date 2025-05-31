@@ -1,51 +1,47 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-export const goalsSlice = createSlice({
+
+export const addGoalAsync = createAsyncThunk(
+  'goals/addGoalAsync',  
+  async (goalData) => {
+    const response = await fetch('http://localhost:3001/goals/addGoal', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': '123',  
+      },
+      body: JSON.stringify(goalData),
+    });
+    
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al agregar la meta');
+    }
+    return data.goal;  
+  }
+);
+
+const goalsSlice = createSlice({
   name: 'goals',
   initialState: {
     value: [],
+    status: 'idle',  
+    error: null,  
   },
   reducers: {
-    addGoal: (state, action) => {
-      // Enviar al backend con los campos title y description
-      fetch('http://localhost:3001/goals/addGoal', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "123456"
-        },
-        body: JSON.stringify({
-          title: action.payload.title,
-          description: action.payload.description || ''
-        }),
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.goal && data.goal.id) {
-          state.value.push({
-            id: data.goal.id,
-            title: data.goal.title,
-            description: data.goal.description,
-            dueDate: action.payload.dueDate || '',
-          });
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-    },
     initAddGoal: (state, action) => {
       state.value.push(action.payload);
     },
     removeGoal: (state, action) => {
       state.value = state.value.filter(goal => goal.id !== action.payload);
-      
+
+     
       fetch(`http://localhost:3001/goals/removeGoal/${action.payload}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": "123"
-        }
+          'Content-Type': 'application/json',
+          'Authorization': '123',
+        },
       }).catch(err => console.log(err));
     },
     updateGoal: (state, action) => {
@@ -53,11 +49,27 @@ export const goalsSlice = createSlice({
       if (index !== -1) {
         state.value[index] = { ...state.value[index], ...action.payload };
       }
-    }
-  }
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(addGoalAsync.pending, (state) => {
+        state.status = 'loading';  
+      })
+      .addCase(addGoalAsync.fulfilled, (state, action) => {
+        state.status = 'succeeded'; 
+        state.value.push(action.payload);  
+      })
+      .addCase(addGoalAsync.rejected, (state, action) => {
+        state.status = 'failed';  
+        state.error = action.error.message; 
+      });
+  },
 });
 
-export const { addGoal, initAddGoal, removeGoal, updateGoal } = goalsSlice.actions;
+export const { initAddGoal, removeGoal, updateGoal } = goalsSlice.actions;
 export const selectGoals = (state) => state.goals.value;
+export const selectGoalStatus = (state) => state.goals.status;
+export const selectGoalError = (state) => state.goals.error;
 
 export default goalsSlice.reducer;

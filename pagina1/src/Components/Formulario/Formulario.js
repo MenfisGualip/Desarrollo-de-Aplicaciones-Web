@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import './Formulario.scss';
 import { useDispatch } from 'react-redux';
 import { useRef } from "react";
-import { addTodo } from '../../reducers/todoSlice';
+import { addTodoAsync } from '../../reducers/todoSlice'; 
 
 function Formulario() {
   const dispatch = useDispatch();
@@ -15,13 +15,13 @@ function Formulario() {
     e.preventDefault();
     
     if (inputRefName.current.value && inputRefDescription.current.value && inputRefDueDate.current.value) {
-      dispatch(addTodo({
+      dispatch(addTodoAsync({  
         name: inputRefName.current.value,
         description: inputRefDescription.current.value,
         dueDate: inputRefDueDate.current.value,
       }));
 
-    
+     
       inputRefName.current.value = "";
       inputRefDescription.current.value = "";
       inputRefDueDate.current.value = "";

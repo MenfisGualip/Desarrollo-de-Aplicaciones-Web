@@ -8,19 +8,19 @@ import Col from 'react-bootstrap/Col';
 import AddingMobileButton from './Components/AddingMobileButton/AddingMobileButton';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addTodo } from './reducers/todoSlice';
+import { addTodoAsync } from './reducers/todoSlice';  
 
 function App() {
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todos.value);
 
-  const arr = [];
+  const arr = [];  
 
   useEffect(() => {
     arr.forEach((item) => {
-      dispatch(addTodo(item));
+      dispatch(addTodoAsync(item));  
     });
-  }, []);
+  }, [dispatch]);  
 
   return (
     <div className="App">
